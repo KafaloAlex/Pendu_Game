@@ -5,7 +5,7 @@ using System.Linq;
 namespace Pendu_Game
 {
     class Program
-    {  
+    {
         //Récupération du mot saisi par le user
         static string recup_mot()
         {
@@ -14,7 +14,7 @@ namespace Pendu_Game
             Console.WriteLine("\n");
             user_mot = Console.ReadLine().ToUpper();
 
-            while(user_mot.Length > 1)
+            while (user_mot.Length > 1)
             {
                 Console.WriteLine("Tcher on dit une lettre maudit là \nReprend tout à zéro chien là");
                 return recup_mot();
@@ -23,20 +23,20 @@ namespace Pendu_Game
         }
 
         //Récupération mot masqué
-        static string recup_mot_étoile(string randomMot, string letter_find) //letter_find représente les lettres déjà trouvé
+        static string recup_mot_étoiler(string randomMot, List<string> letter_find) //letter_find représente les lettres déjà trouvé
         {
             string mot_cache = "";
-            for (int i = 0; i < randomMot.Length; i++)
+            foreach (var item in randomMot)
             {
-                if()
+                item.ToString();
+
+                if (letter_find.Contains(item.ToString()))
+                    mot_cache += item;
+                else
+                    mot_cache += "*";
             }
-            /*mot_masque = ""
-    for lettre in mot_complet:
-        if lettre in lettres_trouvees:
-            mot_masque += lettre
-        else:
-            mot_masque += "*"
-    return mot_masque*/
+
+            return mot_cache;
         }
 
         static void Main(string[] args)
@@ -64,35 +64,44 @@ namespace Pendu_Game
             int listIndex = rnd.Next(wordsList.Count);//Renvoie l'index qu'on utiliseras pour recupérer le mot
 
             string mot_a_trouver = wordsList[listIndex];
-            //var size = mot_a_trouver.Length;
-            List<string> valid_words = new List<string>();
+            //string motUser = recup_mot();
+            Console.WriteLine(mot_a_trouver);
+            int nbreCoups = 0;
 
-            /*bool isValid = true; //Savoir si le joueur est toujours là
-            char userEntry;
 
-            Console.WriteLine("Essayez de trouver le mot:-)");
-            Console.WriteLine("Voici le mot::: {0}", mot_a_trouver);
+            List<string> letter_deja_find = new List<string>(); //Liste des lettres déjà trouvées 
 
-            while (isValid)
+            //var bingo = recup_mot_étoiler(mot_a_trouver, letter_deja_find);
+
+            while (nbreCoups < 10)
             {
-                Console.Write(" Entrez une lettre : ");
-                userEntry =Convert.ToChar(Console.ReadLine().ToUpper());
+                string motUser = recup_mot();//Récupération du mot du user
 
-                for (int i = 0; i < mot_a_trouver.Length; i++)
+                foreach (var item in letter_deja_find)
                 {
-                   *//* char verif = mot_a_trouver[i];*//*
-                    if(userEntry == mot_a_trouver[i])
+                    item.ToString();
+
+                    if (mot_a_trouver.Contains(item))
                     {
-                        valid_words.Add(userEntry);
+                        letter_deja_find.Add(item);
                     }
                     else
                     {
-                        Console.Write("*");
+                        nbreCoups++;
+                        Console.WriteLine("Cette lettre n'est pas dedans");
                     }
                 }
-            }*/
-        }
 
-      
+                var bingo = recup_mot_étoiler(mot_a_trouver, letter_deja_find);
+
+                if(bingo == mot_a_trouver)
+                    Console.WriteLine("Bravo le mot était {0}", mot_a_trouver);
+                else
+                    Console.WriteLine("Vous avez perdu:-(");
+            }
+
+
+
+        }
     }
 }
