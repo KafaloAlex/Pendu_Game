@@ -2,46 +2,69 @@
 using System.Collections.Generic;
 using System.Linq;
 
+
+//L'affichage n'est pas assez bon mais c'est la fonctionnalité qui m'intéressait :-)
+
 namespace Pendu_Game
 {
     class Program
     {
-        //Récupération du mot saisi par le user
-        static string recup_mot()
+        // Voir si le mot existe
+        static bool IsWord(string mot_secret, List<string> mot_a_deviner)
         {
-            string user_mot;
-            Console.Write("Entrez une lettre : ");
-            Console.WriteLine("\n");
-            user_mot = Console.ReadLine().ToUpper();
 
-            while (user_mot.Length > 1)
+            bool word = false;
+
+            for (int i = 0; i < mot_secret.Length; i++)
             {
-                Console.WriteLine("Tcher on dit une lettre maudit là \nReprend tout à zéro chien là");
-                return recup_mot();
-            }
-            return user_mot;
-        }
+                string wordIndex = Convert.ToString(mot_secret[i]);
 
-        //Récupération mot masqué
-        static string recup_mot_étoiler(string randomMot, List<string> letter_find) //letter_find représente les lettres déjà trouvé
-        {
-            string mot_cache = "";
-            foreach (var item in randomMot)
-            {
-                item.ToString();
-
-                if (letter_find.Contains(item.ToString()))
-                    mot_cache += item;
+                if (mot_a_deviner.Contains(wordIndex))
+                {
+                    word = true;
+                }
                 else
-                    mot_cache += "*";
-            }
+                {
+                    return word = false;
+                }
 
-            return mot_cache;
+            }
+            return word;
         }
 
-        static void Main(string[] args)
+        //Verif de la lettre
+        static string IsGoodLetter(string motSecret, List<string> lettreDeviner)
         {
-            //Variables
+            string letterCorrect = "";
+            for (int i = 0; i < motSecret.Length; i++)
+            {
+                string c = Convert.ToString(motSecret[i]);
+
+                if (lettreDeviner.Contains(c))
+                {
+                    letterCorrect += c;
+                }
+                else
+                {
+                    letterCorrect += "*";
+                }
+
+            }
+            return letterCorrect;
+        }
+
+        static void Main()
+        {
+            Console.Title= "Pendu Game by Alex";
+            Console.WriteLine("Bienvenue dans le jeu de Pendu");
+            Console.WriteLine("Règles:\n\t1- Vous devez deviner un mot choisit par l'ordinateur " +
+                "\n\t2- Il vous seras demandez à chaque d'entrez une lettre" +
+                "\n\t3- Si la lettre que vous entrez se trouve dans le mot caché alors vous le verrai apparaitre peu à peu" +
+                "\nNB : Mais attention vous n'avez que 10 chances :-)");
+
+            Console.WriteLine("\n");
+            Console.WriteLine("Ready Go!!!\n");
+            //Liste des Mots
             List<string> wordsList = new List<string> {
                 "ANANAS",
                 "AMOUR",
@@ -61,47 +84,72 @@ namespace Pendu_Game
             };
 
             Random rnd = new Random();
-            int listIndex = rnd.Next(wordsList.Count);//Renvoie l'index qu'on utiliseras pour recupérer le mot
+            int listIndex = rnd.Next(wordsList.Count);//Renvoie un index aléatoire qu'on utiliseras pour recupérer le mot
 
-            string mot_a_trouver = wordsList[listIndex];
-            //string motUser = recup_mot();
-            Console.WriteLine(mot_a_trouver);
-            int nbreCoups = 0;
+            string motSecret = wordsList[listIndex];
+            List<string> lettreDeviner = new List<string>();
 
+            //Console.WriteLine(motSecret);
 
-            List<string> letter_deja_find = new List<string>(); //Liste des lettres déjà trouvées 
+            int nbreCoups = 10;
 
-            //var bingo = recup_mot_étoiler(mot_a_trouver, letter_deja_find);
-
-            while (nbreCoups < 10)
+            Console.WriteLine("Tentez de trouver le mot caché :-)");
+            Console.WriteLine("Le mot caché contient {0} lettres", motSecret.Length);
+            Console.WriteLine("N'oubliez pas vous n'avez que {0} chances", nbreCoups);
+            Console.WriteLine("\n");
+            IsGoodLetter(motSecret, lettreDeviner);
+            while (nbreCoups > 0)
             {
-                string motUser = recup_mot();//Récupération du mot du user
+               
+                Console.Write("Entrez une lettre : ");
+                string input = Console.ReadLine().ToUpper();
+                Console.WriteLine("\n");
 
-                foreach (var item in letter_deja_find)
+                if (lettreDeviner.Contains(input))
                 {
-                    item.ToString();
-
-                    if (mot_a_trouver.Contains(item))
-                    {
-                        letter_deja_find.Add(item);
-                    }
-                    else
-                    {
-                        nbreCoups++;
-                        Console.WriteLine("Cette lettre n'est pas dedans");
-                    }
+                    
+                    Console.WriteLine("Vous avez déjà entrez la lettre {0}\nVeuillez entrez une autre", input);
+                    Console.WriteLine("\n");
+                    continue;
                 }
 
-                var bingo = recup_mot_étoiler(mot_a_trouver, letter_deja_find);
 
-                if(bingo == mot_a_trouver)
-                    Console.WriteLine("Bravo le mot était {0}", mot_a_trouver);
+                // if word found
+                lettreDeviner.Add(input);
+                if (IsWord(motSecret, lettreDeviner))
+                {
+                    Console.ForegroundColor = ConsoleColor.Green;
+                    Console.WriteLine(motSecret);
+                    Console.WriteLine("\n");
+                    Console.WriteLine("\aFélicitations!!!");
+                    break;
+                }
+                else if (motSecret.Contains(input))
+                {
+                    Console.WriteLine("\n");
+                    
+                    string letters = IsGoodLetter(motSecret, lettreDeviner);
+                    Console.Write(letters);
+                }
                 else
-                    Console.WriteLine("Vous avez perdu:-(");
+                {
+                    
+                    Console.WriteLine("Echec, ce mot ne contient pas cette lettre");
+                    nbreCoups -= 1;
+                    Console.WriteLine("Il vous reste {0} coups", nbreCoups);
+                }
+                Console.WriteLine();
+
+                if (nbreCoups == 0)
+                {
+                    Console.ForegroundColor = ConsoleColor.Red;
+                    Console.WriteLine("Game over \nLe mot est [ {0} ]", motSecret);
+                    break;
+                }
+
             }
-
-
-
+            Console.WriteLine("Appuyez une touche pour quitter");
+            Console.ReadKey();
         }
     }
 }
